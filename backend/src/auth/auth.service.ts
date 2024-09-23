@@ -85,18 +85,19 @@ export class AuthService {
     }
 
     if (this.config.get("ldap.enabled")) {
-      this.logger.debug(`Trying LDAP login for user ${dto.username}`);
+      const username = dto.username || dto.email;
+      this.logger.debug(`Trying LDAP login for user ${username}`);
       const ldapUser = await this.ldapService.authenticateUser(
-        dto.username,
+        username,
         dto.password,
       );
       if (ldapUser) {
         const user = await this.userService.findOrCreateFromLDAP(
-          dto.username,
+          username,
           ldapUser,
         );
         this.logger.log(
-          `Successful LDAP login for user ${user.email} from IP ${ip}`,
+          `Successful LDAP login for user ${email} from IP ${ip}`,
         );
         return this.generateToken(user);
       }
